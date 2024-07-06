@@ -1,0 +1,82 @@
+#+TITLE:nebi config
+#+AUTHOR: Ben Wolthuis
+#+DESCRIPTION: My personal config
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+* IMPORTANT PROGRAMS TO LOAD FIRST
+** Straight Package Manager
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+	 (expand-file-name
+	  "straight/repos/straight.el/bootstrap.el"
+	  (or (bound-and-true-p straight-base-dir)
+	      user-emacs-directory)))
+	(bootstrap-version 7))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+	  (url-retrieve-synchronously
+	   "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+	   'silent 'inhibit-cookies)
+	(goto-char (point-max))
+	(eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+  (setq straight-use-package-by-default t)
+#+end_src
+
+** Load Evil Mode
+#+begin_src emacs-lisp
+  ;; Set up package.el to work with MELPA
+  (require 'package)
+  (add-to-list 'package-archives
+	       '("melpa" . "https://melpa.org/packages/"))
+  (package-initialize)
+  (package-refresh-contents)
+
+  ;; Download Evil
+  (unless (package-installed-p 'evil)
+    (package-install 'evil))
+
+  ;; Enable Evil
+  (require 'evil)
+  (evil-mode 1)
+  (evil-set-undo-system 'undo-redo)
+#+end_src
+
+** Magit
+#+begin_src emacs-lisp
+(use-package magit
+  :bind (("C-x g" . magit-status)
+         ("C-x C-g" . magit-status)))
+#+end_src
+
+** Vterm
+#+begin_src emacs-lisp
+(use-package 'vterm
+    :ensure t)
+#+end_src emacs-lisp
+
+
+** Theming
+#+begin_src emacs-lisp
+(use-package timu-macos-theme
+  :ensure t
+  :config
+  (load-theme 'timu-macos t))
+#+end_src
+
+** Keybindings
+#+begin_src
+(require 'evil-states)
+(require 'evil-ex)
+(require 'evil-commands)
+(require 'evil-command-window)
+(require 'evil-common)
+
+(define-key evil-normal-state-map (kbd "C-p") 'consult-find)
+(define-key evil-normal-state-map (kbd "C-n") 'projectile-find-file)
+(define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
+(define-key evil-normal-state-map (kbd "<backtab>") 'previous-buffer)
+#+end_src
