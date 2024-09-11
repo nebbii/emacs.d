@@ -33,28 +33,47 @@
 
 ** Load Evil Mode
 #+begin_src emacs-lisp
-  ;; Set up package.el to work with MELPA
-  (require 'package)
-  (add-to-list 'package-archives
-	       '("melpa" . "https://melpa.org/packages/"))
-  (package-initialize)
-  (package-refresh-contents)
+    ;; Set up package.el to work with MELPA
+    (require 'package)
+    (add-to-list 'package-archives
+           '("melpa" . "https://melpa.org/packages/"))
+    (package-initialize)
+    (package-refresh-contents)
 
-  ;; Download Evil
-  (unless (package-installed-p 'evil)
-    (package-install 'evil))
+    ;; Download Evil
+    (unless (package-installed-p 'evil)
+      (package-install 'evil))
 
-  ;; Enable Evil
-  (require 'evil)
-  (evil-mode 1)
-  (evil-set-undo-system 'undo-redo)
+    ;; Enable Evil
+  (use-package evil
+    :ensure t
+    :init
+    (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode 1)
+    (evil-set-undo-system 'undo-redo))
+
+    (use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (evil-collection-init))
 #+end_src
 
 ** Magit
 #+begin_src emacs-lisp
-(use-package magit
-  :bind (("C-x g" . magit-status)
-         ("C-x C-g" . magit-status)))
+  (use-package magit
+    :bind (("C-x g" . magit-status)
+           ("C-x C-g" . magit-status)))
+#+end_src
+
+** Flycheck
+#+begin_src emacs-lisp
+(use-package flycheck
+  :ensure t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
 
 ** Vterm
@@ -85,11 +104,13 @@
 
 ** Projectile
 #+begin_src emacs-lisp
-(projectile-mode +1)
-;; Recommended keymap prefix on macOS
-(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-;; Recommended keymap prefix on Windows/Linux
-(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1)
+  ;; Recommended keymap prefix on macOS
+  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+  ;; Recommended keymap prefix on Windows/Linux
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (setq projectile-indexing-method 'hybrid)
+  (setq projectile-enable-caching t)
 #+end_src
 
 ** Ivy & etc
@@ -122,7 +143,7 @@
     (define-key evil-normal-state-map (kbd "<f12> v n") 'projectile-run-vterm)
     (define-key evil-normal-state-map (kbd "<f12> v r") 'rename-buffer)
     (define-key evil-normal-state-map (kbd "<f12> p p") 'counsel-projectile-switch-project)
-
+    (define-key evil-normal-state-map (kbd "<f12> g g") 'magit-status)
 
     (general-create-definer nebi/leader-keys
       :states '(normal insert visual emacs)
@@ -142,9 +163,11 @@
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)   ;; change this to 2 if that is the width
   (setq indent-line-function 'insert-tab)
+  (cua-mode)
 
   (global-display-line-numbers-mode)
   (menu-bar--display-line-numbers-mode-relative)
 
-  (global-set-key (kbd "C-v") 'evil-paste-after)
+  (define-key minibuffer-local-map (kbd "ESC") 'keyboard-escape-quit)
+
 #+end_src
