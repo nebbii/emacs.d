@@ -113,6 +113,13 @@
   (setq projectile-enable-caching t)
 #+end_src
 
+** Org mode
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook 'org-indent-mode)
+  (use-package org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+end_src
+
 ** Ivy & etc
 #+begin_src emacs-lisp
 (use-package counsel)
