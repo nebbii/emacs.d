@@ -26,6 +26,11 @@
   (setq straight-use-package-by-default t)
 #+end_src
 
+** Setup Load Path
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.config/emacs/load-path/")
+#+end_src
+
 ** Load Evil Mode
 #+begin_src emacs-lisp
   ;; Set up package.el to work with MELPA
@@ -58,6 +63,17 @@
     :ensure t)
 #+end_src emacs-lisp
 
+** Web mode
+#+begin_src emacs-lisp
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+#+end_src
 
 ** Theming
 #+begin_src emacs-lisp
@@ -67,16 +83,68 @@
   (load-theme 'timu-macos t))
 #+end_src
 
-** Keybindings
-#+begin_src
-(require 'evil-states)
-(require 'evil-ex)
-(require 'evil-commands)
-(require 'evil-command-window)
-(require 'evil-common)
+** Projectile
+#+begin_src emacs-lisp
+(projectile-mode +1)
+;; Recommended keymap prefix on macOS
+(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+;; Recommended keymap prefix on Windows/Linux
+(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+#+end_src
 
-(define-key evil-normal-state-map (kbd "C-p") 'consult-find)
-(define-key evil-normal-state-map (kbd "C-n") 'projectile-find-file)
-(define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
-(define-key evil-normal-state-map (kbd "<backtab>") 'previous-buffer)
+** Ivy & etc
+#+begin_src emacs-lisp
+(use-package counsel)
+(ivy-mode)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+#+end_src
+
+** Keybindings
+#+begin_src emacs-lisp
+  (use-package general
+    :config
+    (general-evil-setup)
+
+    ;(define-key evil-normal-state-map (kbd "C-p") 'consult-find)
+    (define-key evil-normal-state-map (kbd "C-n") 'counsel-projectile-find-file)
+    (define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
+    (define-key evil-normal-state-map (kbd "<backtab>") 'previous-buffer)
+
+    (define-key evil-insert-state-map (kbd "C-c") 'evil-normal-state)
+    (define-key evil-replace-state-map (kbd "C-c") 'evil-normal-state)
+    (define-key evil-visual-state-map (kbd "C-c") 'evil-normal-state)
+
+    (define-key evil-normal-state-map (kbd "<f12> c a") 'async-shell-command)
+    (define-key evil-normal-state-map (kbd "<f12> e") 'treemacs-select-window)
+    (define-key evil-normal-state-map (kbd "<f12> r") 'counsel-projectile-grep)
+
+    (define-key evil-normal-state-map (kbd "<f12> v n") 'projectile-run-vterm)
+    (define-key evil-normal-state-map (kbd "<f12> v r") 'rename-buffer)
+    (define-key evil-normal-state-map (kbd "<f12> p p") 'counsel-projectile-switch-project)
+
+
+    (general-create-definer nebi/leader-keys
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      :prefix "<F12>" ;; set leader
+      :global-prefix "C-x")
+  )
+#+end_src
+
+
+** Miscellaneous settings
+#+begin_src emacs-lisp
+  (setq-default evil-shift-width 2)
+  (setq-default evil-shift-round nil)
+
+  (setq-default ruby-indent-level 2)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 2)   ;; change this to 2 if that is the width
+  (setq indent-line-function 'insert-tab)
+
+  (global-display-line-numbers-mode)
+  (menu-bar--display-line-numbers-mode-relative)
+
+  (global-set-key (kbd "C-v") 'evil-paste-after)
 #+end_src
