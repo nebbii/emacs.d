@@ -54,11 +54,19 @@
     (evil-mode 1)
     (evil-set-undo-system 'undo-redo))
 
-    (use-package evil-collection
+  (use-package evil-collection
     :after evil
     :ensure t
     :config
     (evil-collection-init))
+
+  (use-package evil-org
+    :ensure t
+    :after org
+    :hook (org-mode . (lambda () evil-org-mode))
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 #+end_src
 
 ** Magit
@@ -122,10 +130,17 @@
 
 ** Ivy & etc
 #+begin_src emacs-lisp
-(use-package counsel)
-(ivy-mode)
-(setq ivy-use-virtual-buffers t)
-(setq enable-recursive-minibuffers t)
+  (use-package counsel)
+  (ivy-mode)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+
+  (setq counsel-find-file-ignore-regexp
+        (concat
+         ;; File names beginning with # or .
+         "\\(?:\\`[#.]\\)"
+         ;; File names ending with # or ~
+         "\\|\\(?:\\`.+?[#~]\\'\\)"))
 #+end_src
 
 ** Keybindings
@@ -134,8 +149,6 @@
     :config
     (general-evil-setup)
 
-    ;(define-key evil-normal-state-map (kbd "C-p") 'consult-find)
-    (define-key evil-normal-state-map (kbd "C-n") 'counsel-projectile-find-file)
     (define-key evil-normal-state-map (kbd "<tab>") 'next-buffer)
     (define-key evil-normal-state-map (kbd "<backtab>") 'previous-buffer)
 
@@ -145,12 +158,19 @@
 
     (define-key evil-normal-state-map (kbd "<f12> c a") 'async-shell-command)
     (define-key evil-normal-state-map (kbd "<f12> e") 'treemacs-select-window)
-    (define-key evil-normal-state-map (kbd "<f12> r") 'counsel-projectile-grep)
 
     (define-key evil-normal-state-map (kbd "<f12> v n") 'projectile-run-vterm)
     (define-key evil-normal-state-map (kbd "<f12> v r") 'rename-buffer)
     (define-key evil-normal-state-map (kbd "<f12> p p") 'counsel-projectile-switch-project)
     (define-key evil-normal-state-map (kbd "<f12> g g") 'magit-status)
+
+    ;; Counsel stuff
+    (define-key evil-normal-state-map (kbd "C-n") 'counsel-projectile-find-file)
+    (define-key evil-normal-state-map (kbd "<f12> <") 'counsel-switch-buffer)
+    (define-key evil-normal-state-map (kbd "<f12> r") 'counsel-projectile-grep)
+
+    (define-key evil-normal-state-map (kbd "C-v") 'evil-visual-block)
+    (define-key evil-insert-state-map (kbd "C-v") 'evil-paste-after)
 
     (general-create-definer nebi/leader-keys
       :states '(normal insert visual emacs)
@@ -170,7 +190,6 @@
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)   ;; change this to 2 if that is the width
   (setq indent-line-function 'insert-tab)
-  (cua-mode)
 
   (global-display-line-numbers-mode)
   (menu-bar--display-line-numbers-mode-relative)
