@@ -102,12 +102,24 @@
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 #+end_src
 
+** Yaml mode
+#+begin_src emacs-lisp
+ (require 'yaml-mode)
+ (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+#+end_src
+
 ** Theming
 #+begin_src emacs-lisp
-(use-package timu-macos-theme
+  ;(use-package timu-macos-theme
+  ;  :ensure t
+  ;  :config
+  ;  (load-theme 'timu-macos t))
+  ;(load-file "~/.config/emacs/masked-theme.el")
+  ;(load-theme 'masked t)
+   (use-package timu-spacegrey-theme
   :ensure t
   :config
-  (load-theme 'timu-macos t))
+  (load-theme 'timu-spacegrey t))
 #+end_src
 
 ** Projectile
@@ -123,7 +135,7 @@
 
 ** Org mode
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook 'org-indent-mode)
+  (add-hook 'org-mode-hook 'org-indent-mode)
   (use-package org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+end_src
@@ -141,8 +153,25 @@
          "\\(?:\\`[#.]\\)"
          ;; File names ending with # or ~
          "\\|\\(?:\\`.+?[#~]\\'\\)"))
+
+
+  (use-package amx
+    :ensure t
+    :after ivy
+    :custom
+    (amx-backend 'auto)
+    (amx-save-file "~/.config/emacs/amx-items")
+    (amx-history-length 50)
+    (amx-show-key-bindings nil)
+    :config
+    (amx-mode 1))
 #+end_src
 
+** s3ed
+#+begin_src emacs-lisp
+  (require 's3ed)
+  (s3ed-mode)
+#+end_src
 ** Keybindings
 #+begin_src emacs-lisp
   (use-package general
@@ -196,4 +225,7 @@
 
   (define-key minibuffer-local-map (kbd "ESC") 'keyboard-escape-quit)
 
+  (setopt use-short-answers t)
+
+  (setq term-buffer-maximum-size 0)
 #+end_src
