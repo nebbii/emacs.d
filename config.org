@@ -4,7 +4,7 @@
 #+STARTUP: showeverything
 #+OPTIONS: toc:2
 
-* IMPORTANT PROGRAMS TO LOAD FIRST
+* welcome to the nebi zone
 ** Straight Package Manager
 #+begin_src emacs-lisp
   (defvar bootstrap-version)
@@ -110,13 +110,7 @@
 
 ** Theming
 #+begin_src emacs-lisp
-  ;(use-package timu-macos-theme
-  ;  :ensure t
-  ;  :config
-  ;  (load-theme 'timu-macos t))
-  ;(load-file "~/.config/emacs/masked-theme.el")
-  ;(load-theme 'masked t)
-   (use-package timu-spacegrey-theme
+(use-package timu-spacegrey-theme
   :ensure t
   :config
   (load-theme 'timu-spacegrey t))
@@ -192,6 +186,7 @@
     (define-key evil-normal-state-map (kbd "<f12> v r") 'rename-buffer)
     (define-key evil-normal-state-map (kbd "<f12> p p") 'counsel-projectile-switch-project)
     (define-key evil-normal-state-map (kbd "<f12> g g") 'magit-status)
+    (define-key evil-normal-state-map (kbd "<f12> t w") 'toggle-word-wrap)
 
     ;; Counsel stuff
     (define-key evil-normal-state-map (kbd "C-n") 'counsel-projectile-find-file)
