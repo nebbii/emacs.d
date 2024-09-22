@@ -166,6 +166,20 @@
   (require 's3ed)
   (s3ed-mode)
 #+end_src
+
+** Mood-line
+#+begin_src emacs-lisp
+  (use-package mood-line
+
+  ;; Enable mood-line
+  :config
+  (mood-line-mode)
+
+  ;; Use pretty Fira Code-compatible glyphs
+  :custom
+  (mood-line-glyph-alist mood-line-glyphs-fira-code))
+#+end_src
+
 ** Keybindings
 #+begin_src emacs-lisp
   (use-package general
