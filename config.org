@@ -191,7 +191,8 @@
     ;; Counsel stuff
     (define-key evil-normal-state-map (kbd "C-n") 'counsel-projectile-find-file)
     (define-key evil-normal-state-map (kbd "<f12> <") 'counsel-switch-buffer)
-    (define-key evil-normal-state-map (kbd "<f12> r") 'counsel-projectile-grep)
+    ;(define-key evil-normal-state-map (kbd "<f12> r") 'counsel-projectile-grep)
+    (define-key evil-normal-state-map (kbd "<f12> r") 'counsel-rg)
 
     (define-key evil-normal-state-map (kbd "C-v") 'evil-visual-block)
     (define-key evil-insert-state-map (kbd "C-v") 'evil-paste-after)
