@@ -9,7 +9,8 @@
  ;; If there is more than one, they won't work right.
  '(flycheck-checker-error-threshold 1000)
  '(js-indent-level 2)
- '(magit-display-buffer-function 'magit-display-buffer-fullcolumn-most-v1))
+ '(magit-display-buffer-function 'magit-display-buffer-fullcolumn-most-v1)
+ '(scroll-margin 5))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
