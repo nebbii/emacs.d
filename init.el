@@ -10,7 +10,12 @@
  '(flycheck-checker-error-threshold 1000)
  '(js-indent-level 2)
  '(magit-display-buffer-function 'magit-display-buffer-fullcolumn-most-v1)
- '(scroll-margin 5))
+ '(scroll-margin 5)
+ '(standard-indent 2)
+ '(web-mode-code-indent-offset 2)
+ '(web-mode-css-indent-offset 2)
+ '(web-mode-enable-auto-indentation nil)
+ '(web-mode-markup-indent-offset 2))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
