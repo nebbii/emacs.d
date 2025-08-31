@@ -135,13 +135,18 @@
 #+begin_src emacs-lisp
   (add-hook 'after-init-hook 'global-company-mode)
 #+end_src emacs-lisp
+
+** Yasnippet
+#+begin_src emacs-lisp
+  (require 'yasnippet)
+  (yas-global-mode 1)
+#+end_src
+
 ** Java
 *** lsp-java
 #+begin_src emacs-lisp
   (require 'lsp-java)
   (add-hook 'java-mode-hook #'lsp)
-  (add-to-list 'auto-mode-alist '("\\.java\\'" . java-mode))
-
   (condition-case nil
       (require 'use-package)
     (file-error
@@ -168,8 +173,25 @@
   (use-package helm
     :config (helm-mode))
   (use-package lsp-treemacs)
-#+end_src emacs-lisp
 
+  (use-package lsp-mode
+    :straight t
+    :commands (lsp lsp-deferred)
+    :hook ((c-mode          . lsp-deferred)
+       (c++-mode        . lsp-deferred)
+           (rust-mode       . lsp-deferred)
+       (java-mode       . lsp-deferred))
+    :init
+    (setq lsp-enable-symbol-highlighting t
+      lsp-enable-snippet nil
+      lsp-prefer-flymake nil
+      lsp-log-io t))
+  (require 'lsp-java-boot)
+
+  ;; to enable the lenses
+  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+  (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
+#+end_src emacs-lisp
 
 ** Vterm
 #+begin_src emacs-lisp
