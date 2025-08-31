@@ -104,7 +104,7 @@
 #+begin_src emacs-lisp
 ; (require 'flymake)
 ;
-; ;; I don't like the default colors :)
+; ;; I don't like the default colors
 ; (set-face-background 'flymake-errline "red4")
 ; (set-face-background 'flymake-warnline "dark slate blue")
 ;
@@ -173,6 +173,7 @@
   ;; Recommended keymap prefix on Windows/Linux
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   ;;(setq projectile-project-search-path '("~/Projects/" "~/notes/" "~/.emacs.d/"))
+  (setq projectile-project-search-path '("~/Documents/"))
   (setq projectile-indexing-method 'hybrid)
   (setq projectile-enable-caching t)
   (projectile-discover-projects-in-search-path)
@@ -287,8 +288,8 @@
   (define-key minibuffer-local-map (kbd "ESC") 'keyboard-escape-quit)
   (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 
-
-  (setopt use-short-answers t)
+  ; doesn't seem to work properly in emacs 30+?
+  ;(setopt use-short-answers 'flat-button)
 
   (setq term-buffer-maximum-size 0)
   (menu-bar-mode -1)
