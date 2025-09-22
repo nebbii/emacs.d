@@ -261,7 +261,17 @@
          "\\(?:\\`[#.]\\)"
          ;; File names ending with # or ~
          "\\|\\(?:\\`.+?[#~]\\'\\)"))
-
+  (use-package ivy
+  :init
+  (ivy-mode 1)
+  (defun ivy-toggle-mark ()
+    "Toggle mark for current candidate and move forwards."
+    (interactive)
+    (if (ivy--marked-p)
+        (ivy-unmark)
+      (ivy-mark)))
+  :bind (:map ivy-minibuffer-map
+              ("C-SPC" . ivy-toggle-mark)))
 
   ;(use-package amx
   ;  :ensure t
