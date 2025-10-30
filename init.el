@@ -11,6 +11,8 @@
  '(js-indent-level 2)
  '(magit-display-buffer-function 'magit-display-buffer-fullcolumn-most-v1)
  '(scroll-margin 5)
+ '(org-export-with-section-numbers t)
+ '(show-trailing-whitespace t)
  '(standard-indent 2)
  '(web-mode-code-indent-offset 2)
  '(web-mode-css-indent-offset 2)
@@ -22,4 +24,5 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(magit-diff-base ((t (:extend t :background "#d08770" :foreground "dark red"))))
- '(magit-diff-base-highlight ((t (:extend t :background "#d08770" :foreground "dark red" :weight bold)))))
+ '(magit-diff-base-highlight ((t (:extend t :background "#d08770" :foreground "dark red" :weight bold))))
+ '(smerge-lower ((t (:extend t :background "#384929")))))

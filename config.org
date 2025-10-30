@@ -39,7 +39,7 @@
     (add-to-list 'package-archives
            '("melpa" . "https://melpa.org/packages/"))
     (package-initialize)
-    (package-refresh-contents)
+    ;;(package-refresh-contents)
 
     ;; Download Evil
     (unless (package-installed-p 'evil)
@@ -235,7 +235,7 @@
   ;; Recommended keymap prefix on Windows/Linux
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   ;;(setq projectile-project-search-path '("~/Projects/" "~/notes/" "~/.emacs.d/"))
-  (setq projectile-project-search-path '("~/Documents/"))
+  (setq projectile-project-search-path '("~/Projects/" "~/work_notes/" "~/.emacs.d/" "~/Documents/"))
   (setq projectile-indexing-method 'hybrid)
   (setq projectile-enable-caching t)
   (projectile-discover-projects-in-search-path)
@@ -349,6 +349,8 @@
   (setq-default evil-shift-width 2)
   (setq-default evil-shift-round nil)
 
+  (setq-default show-trailing-whitespace 1)
+
   (setq-default ruby-indent-level 2)
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 2)   ;; change this to 2 if that is the width
@@ -360,13 +362,18 @@
   (define-key minibuffer-local-map (kbd "ESC") 'keyboard-escape-quit)
   (define-key evil-insert-state-map (kbd "TAB") 'tab-to-tab-stop)
 
-  ; doesn't seem to work properly in emacs 30+?
-  ;(setopt use-short-answers 'flat-button)
+  (setopt use-short-answers t)
 
   (setq term-buffer-maximum-size 0)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
   (add-hook 'dired-mode-hook 'auto-revert-mode)
+
+  (add-hook 'before-save-hook
+    (lambda ()
+      (unless (eq major-mode 'fundamental-mode)
+        (delete-trailing-whitespace))))
+
 
 #+end_src
