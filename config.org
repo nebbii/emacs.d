@@ -39,7 +39,7 @@
     (add-to-list 'package-archives
            '("melpa" . "https://melpa.org/packages/"))
     (package-initialize)
-    ;;(package-refresh-contents)
+    (package-refresh-contents)
 
     ;; Download Evil
     (unless (package-installed-p 'evil)
@@ -133,7 +133,20 @@
 
 ** Company
 #+begin_src emacs-lisp
-  (add-hook 'after-init-hook 'global-company-mode)
+  (use-package company
+    :defer 0.1
+    :config
+    (global-company-mode t)
+    (setq-default
+        company-idle-delay 0.05
+        company-require-match nil
+        company-minimum-prefix-length 0
+
+        ;; get only preview
+        company-frontends '(company-preview-frontend)
+        ;; also get a drop down
+        ;; company-frontends '(company-pseudo-tooltip-frontend company-preview-frontend)
+        ))
 #+end_src emacs-lisp
 
 ** Yasnippet
@@ -304,6 +317,72 @@
   (mood-line-glyph-alist mood-line-glyphs-fira-code))
 #+end_src
 
+** Comingle
+- Autocomplete doesn't seem to work too good, and the chat is a bit limited
+#+begin_src emacs-lisp
+;(defvar my/comingle-is-enabled t)
+;
+;(use-package comingle
+;  :after (pinentry)
+;  :ensure t
+;  :straight '(:type git :host github :repo "jeff-phil/comingle.el")
+;  :diminish "🧠"
+;  :commands (my/comingle-toggle comingle-mode)
+;  :bind
+;  (("s-<return>" . comingle-accept-completion)
+;   ("S-<return>" . comingle-accept-completion-line)
+;   ("M-<return>" . comingle-accept-completion-word)
+;   ("C-<return>" . comingle-accept-completion-character)
+;   ("H-j" . comingle-next-completion)
+;   ("H-k" . comingle-prev-completion)
+;   ("H-C" . my/comingle-toggle)
+;   ("C-c p c" . comingle-chat-open))
+;  :hook (prog-mode . my/try-run-comingle-mode)
+;  :config
+;  (defun my/try-run-comingle-mode ()
+;    "Use in hook, like prog-mode-hook, so that can test first if comingle is enabled."
+;    (when (bound-and-true-p my/comingle-is-enabled)
+;      (comingle-mode)))
+;
+;  (defun my/comingle-toggle (&optional state)
+;    "Toggle comingle's enabled state."
+;    (interactive)
+;    (let ((current-state (or state comingle-state)))
+;      (cond
+;       (my/comingle-is-enabled
+;        (when (and current-state (comingle-state-proc current-state))
+;          (comingle-reset))
+;        (setq my/comingle-is-enabled nil)
+;        (message "Comingle disabled"))
+;       (t
+;        (setopt comingle/metadata/api_key
+;                (auth-source-pass-get 'secret "ai/api_key@codeium.com"))
+;        (when current-state
+;          (comingle-reset))
+;        (comingle-init)
+;        (setq my/comingle-is-enabled t)
+;        (message "Comingle enabled")))))
+;
+;  (setq use-dialog-box nil)
+;  (setq comingle-mode-line-enable
+;        (lambda (api)
+;          (when (bound-and-true-p my/comingle-is-enabled)
+;            (not (memq api '(CancelRequest Heartbeat AcceptCompletion))))))
+;  (add-to-list 'mode-line-format '(:eval (car-safe comingle-mode-line)) t)
+;
+;  ;; Custom text/cursor functions
+;  (defun my/comingle/document/text ()
+;    (buffer-substring-no-properties
+;     (max (- (point) 3000) (point-min))
+;     (min (+ (point) 1000) (point-max))))
+;
+;  (defun my/comingle/document/cursor_offset ()
+;    (comingle-utf8-byte-length
+;     (buffer-substring-no-properties (max (- (point) 3000) (point-min)) (point))))
+;
+;  (setq comingle/document/text 'my/comingle/document/text)
+;  (setq comingle/document/cursor_offset 'my/comingle/document/cursor_offset))
+#+end_src
 ** Keybindings
 #+begin_src emacs-lisp
   (use-package general
