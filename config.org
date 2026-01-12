@@ -158,52 +158,87 @@
 ** Java
 *** lsp-java
 #+begin_src emacs-lisp
-  (require 'lsp-java)
-  (add-hook 'java-mode-hook #'lsp)
-  (condition-case nil
-      (require 'use-package)
-    (file-error
-     (require 'package)
-     (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-     (package-initialize)
-     (package-refresh-contents)
-     (package-install 'use-package)
-     (setq use-package-always-ensure t)
-     (require 'use-package)))
+  ;; Java / LSP setup (drop-in replacement)
 
-  (use-package projectile)
-  (use-package flycheck)
-  (use-package yasnippet :config (yas-global-mode))
-  (use-package lsp-mode :hook ((lsp-mode . lsp-enable-which-key-integration)))
-  (use-package hydra)
-  (use-package company)
-  (use-package lsp-ui)
-  (use-package which-key :config (which-key-mode))
-  (use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
-  (use-package dap-mode :after lsp-mode :config (dap-auto-configure-mode))
-  (use-package dap-java :ensure nil)
-  (use-package helm-lsp)
-  (use-package helm
-    :config (helm-mode))
-  (use-package lsp-treemacs)
+  ;; Ensure use-package exists (keep your fallback install logic)
+  ;(condition-case nil
+  ;    (require 'use-package)
+  ;  (file-error
+  ;   (require 'package)
+  ;   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+  ;   (package-initialize)
+  ;   (package-refresh-contents)
+  ;   (package-install 'use-package)
+  ;   (setq use-package-always-ensure t)
+  ;   (require 'use-package)))
 
-  (use-package lsp-mode
-    :straight t
-    :commands (lsp lsp-deferred)
-    :hook ((c-mode          . lsp-deferred)
-       (c++-mode        . lsp-deferred)
-           (rust-mode       . lsp-deferred)
-       (java-mode       . lsp-deferred))
-    :init
-    (setq lsp-enable-symbol-highlighting t
-      lsp-enable-snippet nil
-      lsp-prefer-flymake nil
-      lsp-log-io t))
-  (require 'lsp-java-boot)
+  ;;; Nice-to-haves
+  ;(use-package projectile)
+  ;(use-package flycheck)
+  ;(use-package yasnippet :config (yas-global-mode))
+  ;(use-package hydra)
+  ;(use-package company)
+  ;(use-package which-key :config (which-key-mode))
+  ;(use-package helm :config (helm-mode))
 
-  ;; to enable the lenses
-  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
-  (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
+  ;;; Core LSP
+  ;(use-package lsp-mode
+  ;  :commands (lsp lsp-deferred)
+  ;  :hook ((lsp-mode . lsp-enable-which-key-integration)
+  ;         (c-mode . lsp-deferred)
+  ;         (c++-mode . lsp-deferred)
+  ;         (rust-mode . lsp-deferred)
+  ;         ;; IMPORTANT: support both classic and tree-sitter Java modes
+  ;         (java-mode . lsp-deferred)
+  ;         (java-ts-mode . lsp-deferred))
+  ;  :init
+  ;  (setq lsp-enable-symbol-highlighting t
+  ;        lsp-enable-snippet nil
+  ;        lsp-prefer-flymake nil
+  ;        lsp-log-io t))
+
+  ;(use-package lsp-ui)
+  ;(use-package lsp-treemacs)
+  ;(use-package helm-lsp)
+
+  ;;; Java (JDTLS)
+  ;(use-package lsp-java
+  ;  :after lsp-mode
+  ;  :init
+  ;  (setq lsp-java-java-path "/usr/lib/jvm/java-21-openjdk/bin/java"
+  ;        lsp-java-configuration-runtimes
+  ;        '[(:name "JavaSE-21"
+  ;           :path "/usr/lib/jvm/java-21-openjdk"
+  ;           :default t)]))
+
+  ;;; DAP (debugging)
+  ;(use-package dap-mode
+  ;  :after lsp-mode
+  ;  :config (dap-auto-configure-mode))
+  ;(use-package dap-java :ensure nil)
+
+  ;;; Spring Boot lenses (optional, but you had it)
+  ;(require 'lsp-java-boot)
+
+  ;;; Lenses
+  ;(add-hook 'lsp-mode-hook #'lsp-lens-mode)
+  ;(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
+  ;(add-hook 'java-ts-mode-hook #'lsp-java-boot-lens-mode)
+#+end_src emacs-lisp
+*** Eglot
+#+begin_src emacs-lisp
+;; Use Eglot for Java
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '(java-mode . ("jdtls"))))
+
+(add-hook 'java-mode-hook 'eglot-ensure)
+
+(add-hook 'after-init-hook 'global-company-mode)
+(setq company-idle-delay 0.1)
+(setq company-minimum-prefix-length 1)
+;; important: use completion-at-point (what eglot provides)
+(setq company-backends '(company-capf))
+
 #+end_src emacs-lisp
 
 ** Vterm
@@ -248,7 +283,8 @@
   ;; Recommended keymap prefix on Windows/Linux
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   ;;(setq projectile-project-search-path '("~/Projects/" "~/notes/" "~/.emacs.d/"))
-  (setq projectile-project-search-path '("~/Projects/" "~/work_notes/" "~/.emacs.d/" "~/Documents/"))
+  ;(setq projectile-project-search-path '("~/Projects/" "~/Documents/projects/" "~/work_notes/" "~/.emacs.d/" "~/Documents/"))
+  ;(setq projectile-project-search-path '("~/Documents/" "~/Documents/projects/" "~/.emacs.d/"))
   (setq projectile-indexing-method 'hybrid)
   (setq projectile-enable-caching t)
   (projectile-discover-projects-in-search-path)
