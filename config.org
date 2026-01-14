@@ -147,7 +147,7 @@
         ;; also get a drop down
         ;; company-frontends '(company-pseudo-tooltip-frontend company-preview-frontend)
         ))
-#+end_src emacs-lisp
+#+end_src
 
 ** Yasnippet
 #+begin_src emacs-lisp
@@ -224,7 +224,7 @@
   ;(add-hook 'lsp-mode-hook #'lsp-lens-mode)
   ;(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
   ;(add-hook 'java-ts-mode-hook #'lsp-java-boot-lens-mode)
-#+end_src emacs-lisp
+#+end_src
 *** Eglot
 #+begin_src emacs-lisp
 ;; Use Eglot for Java
@@ -239,15 +239,8 @@
 ;; important: use completion-at-point (what eglot provides)
 (setq company-backends '(company-capf))
 
-#+end_src emacs-lisp
+#+end_src
 
-** Vterm
-#+begin_src emacs-lisp
-(use-package 'vterm
-    :ensure t)
-
-(define-key vterm-mode-map (kbd "C-c C-c") 'vterm--self-insert)
-#+end_src emacs-lisp
 
 ** Web mode
 #+begin_src emacs-lisp
@@ -284,7 +277,7 @@
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   ;;(setq projectile-project-search-path '("~/Projects/" "~/notes/" "~/.emacs.d/"))
   ;(setq projectile-project-search-path '("~/Projects/" "~/Documents/projects/" "~/work_notes/" "~/.emacs.d/" "~/Documents/"))
-  ;(setq projectile-project-search-path '("~/Documents/" "~/Documents/projects/" "~/.emacs.d/"))
+  (setq projectile-project-search-path '("~/Documents/" "~/Documents/projects/" "~/.emacs.d/"))
   (setq projectile-indexing-method 'hybrid)
   (setq projectile-enable-caching t)
   (projectile-discover-projects-in-search-path)
