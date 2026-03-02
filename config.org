@@ -227,21 +227,34 @@
 #+end_src
 *** Eglot
 #+begin_src emacs-lisp
-;; Use Eglot for Java
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs '(java-mode . ("jdtls"))))
+  ;; Use Eglot for Java
+  (with-eval-after-load 'eglot
+    (setq eglot-workspace-configuration
+	    '((:java
+	    (:configuration
+		(:runtimes
+		[(:name "JavaSE-21"
+		:path "/usr/lib/jvm/java-21-openjdk"
+		:default t)])))))
+    (add-to-list 'eglot-server-programs '(java-mode . ("jdtls"))))
 
-(add-hook 'java-mode-hook 'eglot-ensure)
+  (add-hook 'java-mode-hook 'eglot-ensure)
 
-(add-hook 'after-init-hook 'global-company-mode)
-(setq company-idle-delay 0.1)
-(setq company-minimum-prefix-length 1)
-;; important: use completion-at-point (what eglot provides)
-(setq company-backends '(company-capf))
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-idle-delay 0.1)
+  (setq company-minimum-prefix-length 1)
+
+  (setq company-backends '(company-capf))
 
 #+end_src
-
-
+*** Misc. java config
+#+begin_src emacs-lisp
+  (add-hook 'java-mode-hook
+  (lambda ()
+    (setq-local c-basic-offset 4)
+    (setq-local tab-width 4)
+    (setq-local evil-shift-width 4)))
+#+end_src
 ** Web mode
 #+begin_src emacs-lisp
 (require 'web-mode)
