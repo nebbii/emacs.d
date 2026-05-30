@@ -301,6 +301,11 @@
   (add-hook 'org-mode-hook 'org-indent-mode)
   (use-package org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (setq-local truncate-lines nil)
+              (setq-local word-wrap t)
+              (visual-line-mode 1)))
 #+end_src
 
 ** Ivy & etc
