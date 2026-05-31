@@ -231,7 +231,7 @@
             :inlayHintProvider))
 
     (add-to-list 'eglot-server-programs
-                 '(java-mode . ("jdtls"))))
+                 '(java-mode . ("jdtls" "-data" "~/.cache/emacs-jdtls-workspace"))))
 
   (add-hook 'java-mode-hook #'eglot-ensure)
 
