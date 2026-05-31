@@ -103,35 +103,23 @@
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
 #+end_src
 
-** Flymake (disabled)
+*** Quiet Flymake in terminal Emacs
 #+begin_src emacs-lisp
-; (require 'flymake)
-;
-; ;; I don't like the default colors
-; (set-face-background 'flymake-errline "red4")
-; (set-face-background 'flymake-warnline "dark slate blue")
-;
-; ;; Invoke ruby with '-c' to get syntax checking
-; (defun flymake-ruby-init ()
-;   (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-;                        'flymake-create-temp-inplace))
-; 	 (local-file  (file-relative-name
-;                        temp-file
-;                        (file-name-directory buffer-file-name))))
-;     (list "ruby" (list "-c" local-file))))
-;
-; (push '(".+\\.rb$" flymake-ruby-init) flymake-allowed-file-name-masks)
-; (push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
-;
-; (push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3) flymake-err-line-patterns)
-;
-; (add-hook 'ruby-mode-hook
-;           '(lambda ()
-;
-; 	     ;; Don't want flymake mode for ruby regions in rhtml files and also on read only files
-; 	     (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
-; 		 (flymake-mode))
-; 	     ))
+  ;; Eglot uses Flymake for diagnostics.
+  ;; In terminal Emacs, keep diagnostics available but reduce visual clutter.
+  (unless (display-graphic-p)
+    (with-eval-after-load 'flymake
+      ;; Do not place diagnostic indicators in the fringe/margin.
+      (setq flymake-fringe-indicator-position nil)
+
+      ;; Do not constantly re-check while typing.
+      (setq flymake-no-changes-timeout 1.5)
+      (setq flymake-start-on-save-buffer t)
+
+      ;; Remove warning/error underlines in terminal.
+      (set-face-attribute 'flymake-error nil :underline nil)
+      (set-face-attribute 'flymake-warning nil :underline nil)
+      (set-face-attribute 'flymake-note nil :underline nil)))
 #+end_src
 
 ** Company
@@ -140,16 +128,22 @@
     :defer 0.1
     :config
     (global-company-mode t)
-    (setq-default
-        company-idle-delay 0.05
-        company-require-match nil
-        company-minimum-prefix-length 0
 
-        ;; get only preview
-        company-frontends '(company-preview-frontend)
-        ;; also get a drop down
-        ;; company-frontends '(company-pseudo-tooltip-frontend company-preview-frontend)
-        ))
+    (setq-default
+     company-idle-delay nil
+     company-require-match nil
+     company-minimum-prefix-length 1)
+
+    ;; GUI: allow normal popup.
+    ;; Terminal: avoid inline preview overlays.
+    (if (display-graphic-p)
+        (setq company-frontends
+              '(company-pseudo-tooltip-frontend
+                company-preview-frontend
+                company-echo-metadata-frontend))
+      (setq company-frontends
+            '(company-pseudo-tooltip-frontend
+              company-echo-metadata-frontend))))
 #+end_src
 
 ** Yasnippet
@@ -233,23 +227,28 @@
   ;; Use Eglot for Java
   (with-eval-after-load 'eglot
     (setq eglot-workspace-configuration
-	    '((:java
-	    (:configuration
-		(:runtimes
-		[(:name "JavaSE-21"
-		:path "/usr/lib/jvm/java-21-openjdk"
-		:default t)])))))
-    (add-to-list 'eglot-server-programs '(java-mode . ("jdtls"))))
+          '((:java
+             (:configuration
+              (:runtimes
+               [(:name "JavaSE-21"
+                 :path "/usr/lib/jvm/java-21-openjdk"
+                 :default t)])))))
 
-  (add-hook 'java-mode-hook 'eglot-ensure)
+    ;; Disable noisy LSP decorations.
+    (setq eglot-ignored-server-capabilities
+          '(:documentHighlightProvider
+            :inlayHintProvider))
 
-  (add-hook 'after-init-hook 'global-company-mode)
-  (setq company-idle-delay 0.1)
-  (setq company-minimum-prefix-length 1)
+    (add-to-list 'eglot-server-programs
+                 '(java-mode . ("jdtls"))))
 
-  (setq company-backends '(company-capf))
+  (add-hook 'java-mode-hook #'eglot-ensure)
 
+  ;; Eglot completion via company-capf.
+  (with-eval-after-load 'company
+    (setq company-backends '(company-capf)))
 #+end_src
+
 *** Misc. java config
 #+begin_src emacs-lisp
   (add-hook 'java-mode-hook
@@ -278,10 +277,9 @@
 
 ** Theming
 #+begin_src emacs-lisp
-(use-package timu-spacegrey-theme
-  :ensure t
+(use-package doom-themes
   :config
-  (load-theme 'timu-spacegrey t))
+  (load-theme 'doom-one t))
 #+end_src
 
 ** Projectile
@@ -455,12 +453,12 @@
 
     (define-key evil-normal-state-map (kbd "<f12> v n") 'projectile-run-vterm)
     (define-key evil-normal-state-map (kbd "<f12> v r") 'rename-buffer)
-    (define-key evil-normal-state-map (kbd "<f12> p p") 'counsel-projectile-switch-project)
+    (define-key evil-normal-state-map (kbd "<f12> p p") 'projectile-switch-project)
     (define-key evil-normal-state-map (kbd "<f12> g g") 'magit-status)
     (define-key evil-normal-state-map (kbd "<f12> t w") 'toggle-word-wrap)
 
     ;; Counsel stuff
-    (define-key evil-normal-state-map (kbd "C-n") 'counsel-projectile-find-file)
+    (define-key evil-normal-state-map (kbd "C-n") 'projectile-find-file)
     (define-key evil-normal-state-map (kbd "<f12> <") 'counsel-switch-buffer)
     ;(define-key evil-normal-state-map (kbd "<f12> r") 'counsel-projectile-grep)
     (define-key evil-normal-state-map (kbd "<f12> r") 'counsel-rg)
@@ -498,9 +496,14 @@
   (setq use-short-answers t)
 
   (setq term-buffer-maximum-size 0)
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
+  (when (fboundp 'menu-bar-mode)
+    (menu-bar-mode -1))
+
+  (when (fboundp 'scroll-bar-mode)
+    (scroll-bar-mode -1))
+
+  (when (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1))
   (add-hook 'dired-mode-hook 'auto-revert-mode)
 
   (add-hook 'before-save-hook
