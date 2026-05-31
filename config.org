@@ -112,26 +112,29 @@
 
 ** Company
 #+begin_src emacs-lisp
-  (use-package company
-    :defer 0.1
-    :config
-    (global-company-mode t)
+(use-package company
+  :ensure t
+  :defer 0.1
+  :config
+  (global-company-mode t)
 
-    (setq-default
-     company-idle-delay nil
-     company-require-match nil
-     company-minimum-prefix-length 1)
+  (setq-default
+   company-idle-delay nil
+   company-require-match nil
+   company-minimum-prefix-length 1
+   company-backends '(company-capf))
 
-    ;; GUI: allow normal popup.
-    ;; Terminal: avoid inline preview overlays.
-    (if (display-graphic-p)
-        (setq company-frontends
-              '(company-pseudo-tooltip-frontend
-                company-preview-frontend
-                company-echo-metadata-frontend))
-      (setq company-frontends
-            '(company-pseudo-tooltip-frontend
-              company-echo-metadata-frontend))))
+  ;; Terminal-friendly completion UI.
+  (setq company-frontends
+        '(company-pseudo-tooltip-frontend
+          company-echo-metadata-frontend))
+
+  ;; Manual completion.
+  (global-set-key (kbd "TAB") #'completion-at-point)
+  (global-set-key (kbd "<tab>") #'completion-at-point)
+
+  ;; Optional: also bind C-TAB if your terminal supports it.
+  (global-set-key (kbd "C-<tab>") #'company-complete))
 #+end_src
 
 ** Yasnippet
