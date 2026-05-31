@@ -90,36 +90,24 @@
   (use-package flycheck
     :ensure t
     :config
-    (add-hook 'after-init-hook #'global-flycheck-mode))
+    ;; Do not enable Flycheck globally. It conflicts visually with Eglot/Flymake
+    ;; and is noisy in terminal Emacs.
+    ;; (global-flycheck-mode)
 
-  (add-hook 'ruby-mode-hook
-    (lambda ()
-    (setq-local flycheck-command-wrapper-function
-    (lambda (command) (append '("bundle" "exec") command)))))
+    ;; Enable Flycheck only where you actually want it.
+    (add-hook 'ruby-mode-hook #'flycheck-mode)
 
-  (setq flycheck-ruby-rubocop-executable "~/.rbenv/shims/rubocop")
-  (setq flycheck-ruby-reek-executable "~/.rbenv/shims/reek")
+    (add-hook 'ruby-mode-hook
+              (lambda ()
+                (setq-local flycheck-command-wrapper-function
+                            (lambda (command)
+                              (append '("bundle" "exec") command)))))
 
-  (setq flycheck-check-syntax-automatically '(mode-enabled save))
-#+end_src
+    (setq flycheck-ruby-rubocop-executable "~/.rbenv/shims/rubocop")
+    (setq flycheck-ruby-reek-executable "~/.rbenv/shims/reek")
 
-*** Quiet Flymake in terminal Emacs
-#+begin_src emacs-lisp
-  ;; Eglot uses Flymake for diagnostics.
-  ;; In terminal Emacs, keep diagnostics available but reduce visual clutter.
-  (unless (display-graphic-p)
-    (with-eval-after-load 'flymake
-      ;; Do not place diagnostic indicators in the fringe/margin.
-      (setq flymake-fringe-indicator-position nil)
-
-      ;; Do not constantly re-check while typing.
-      (setq flymake-no-changes-timeout 1.5)
-      (setq flymake-start-on-save-buffer t)
-
-      ;; Remove warning/error underlines in terminal.
-      (set-face-attribute 'flymake-error nil :underline nil)
-      (set-face-attribute 'flymake-warning nil :underline nil)
-      (set-face-attribute 'flymake-note nil :underline nil)))
+    ;; Only check on mode enable and save, not while typing.
+    (setq flycheck-check-syntax-automatically '(mode-enabled save)))
 #+end_src
 
 ** Company
@@ -247,6 +235,14 @@
   ;; Eglot completion via company-capf.
   (with-eval-after-load 'company
     (setq company-backends '(company-capf)))
+
+  ;; Terminal Java buffers: no live diagnostic UI.
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (when (derived-mode-p 'java-mode)
+                (flymake-mode -1)
+                (when (bound-and-true-p flycheck-mode)
+                  (flycheck-mode -1)))))
 #+end_src
 
 *** Misc. java config
