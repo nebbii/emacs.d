@@ -151,8 +151,9 @@
 
 ** Yasnippet
 #+begin_src emacs-lisp
-  (require 'yasnippet)
-  (yas-global-mode 1)
+  (use-package yasnippet
+    :config
+    (yas-global-mode 1))
 #+end_src
 
 ** Java
@@ -255,22 +256,23 @@
     (setq-local tab-width 4)
     (setq-local evil-shift-width 4)))
 #+end_src
+
 ** Web mode
 #+begin_src emacs-lisp
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (use-package web-mode
+    :mode (("\\.phtml\\'" . web-mode)
+           ("\\.tpl\\.php\\'" . web-mode)
+           ("\\.[agj]sp\\'" . web-mode)
+           ("\\.as[cp]x\\'" . web-mode)
+           ("\\.erb\\'" . web-mode)
+           ("\\.mustache\\'" . web-mode)
+           ("\\.djhtml\\'" . web-mode)))
 #+end_src
 
 ** Yaml mode
 #+begin_src emacs-lisp
- (require 'yaml-mode)
- (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  (use-package yaml-mode
+    :mode ("\\.yml\\'" . yaml-mode))
 #+end_src
 
 ** Theming
@@ -283,17 +285,23 @@
 
 ** Projectile
 #+begin_src emacs-lisp
-  (projectile-mode +1)
-  ;; Recommended keymap prefix on macOS
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  ;; Recommended keymap prefix on Windows/Linux
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  ;;(setq projectile-project-search-path '("~/Projects/" "~/notes/" "~/.emacs.d/"))
-  ;(setq projectile-project-search-path '("~/Projects/" "~/Documents/projects/" "~/work_notes/" "~/.emacs.d/" "~/Documents/"))
-  (setq projectile-project-search-path '("~/Documents/" "~/Documents/projects/" "~/.emacs.d/"))
-  (setq projectile-indexing-method 'hybrid)
-  (setq projectile-enable-caching t)
-  (projectile-discover-projects-in-search-path)
+  (use-package projectile
+    :config
+    (projectile-mode +1)
+
+    ;; Recommended keymap prefix on macOS
+    (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+
+    ;; Recommended keymap prefix on Windows/Linux
+    (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
+    (setq projectile-project-search-path
+          '("~/Documents/" "~/Projects/" "~/Documents/projects/" "~/.emacs.d/"))
+
+    (setq projectile-indexing-method 'hybrid)
+    (setq projectile-enable-caching t)
+
+    (projectile-discover-projects-in-search-path))
 #+end_src
 
 ** Org mode
@@ -347,8 +355,9 @@
 
 ** s3ed
 #+begin_src emacs-lisp
-  (require 's3ed)
-  (s3ed-mode)
+  (use-package s3ed
+    :config
+    (s3ed-mode))
 #+end_src
 
 ** Mood-line
