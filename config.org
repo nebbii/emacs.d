@@ -24,6 +24,8 @@
     (load bootstrap-file nil 'nomessage))
 
   (setq straight-use-package-by-default t)
+  (straight-use-package 'use-package)
+  (require 'use-package)
 #+end_src
 
 ** Setup Load Path
@@ -34,18 +36,18 @@
 
 ** Load Evil Mode
 #+begin_src emacs-lisp
-    ;; Set up package.el to work with MELPA
-    (require 'package)
-    (add-to-list 'package-archives
-           '("melpa" . "https://melpa.org/packages/"))
-    (package-initialize)
-    (package-refresh-contents)
+  ;; Set up package.el to work with MELPA
+  ;;(require 'package)
+  ;;(add-to-list 'package-archives
+  ;;       '("melpa" . "https://melpa.org/packages/"))
+  ;;(package-initialize)
+  ;;(package-refresh-contents)
 
-    ;; Download Evil
-    (unless (package-installed-p 'evil)
-      (package-install 'evil))
+  ;;;; Download Evil
+  ;;(unless (package-installed-p 'evil)
+  ;;  (package-install 'evil))
 
-    ;; Enable Evil
+  ;; Enable Evil
   (use-package evil
     :ensure t
     :init
@@ -87,48 +89,18 @@
   (use-package flycheck
     :ensure t
     :config
-    (add-hook 'after-init-hook #'global-flycheck-mode))
+    ;; Enable Flycheck only where you actually want it.
+    (add-hook 'ruby-mode-hook #'flycheck-mode)
+    (add-hook 'ruby-mode-hook
+      (lambda ()
+      (setq-local flycheck-command-wrapper-function
+      (lambda (command) (append '("bundle" "exec") command)))))
 
-  (add-hook 'ruby-mode-hook
-    (lambda ()
-    (setq-local flycheck-command-wrapper-function
-    (lambda (command) (append '("bundle" "exec") command)))))
+    (setq flycheck-ruby-rubocop-executable "~/.rbenv/shims/rubocop")
+    (setq flycheck-ruby-reek-executable "~/.rbenv/shims/reek")
 
-  (setq flycheck-ruby-rubocop-executable "~/.rbenv/shims/rubocop")
-  (setq flycheck-ruby-reek-executable "~/.rbenv/shims/reek")
-
-  (setq flycheck-check-syntax-automatically '(mode-enabled save))
-#+end_src
-
-** Flymake (disabled)
-#+begin_src emacs-lisp
-; (require 'flymake)
-;
-; ;; I don't like the default colors
-; (set-face-background 'flymake-errline "red4")
-; (set-face-background 'flymake-warnline "dark slate blue")
-;
-; ;; Invoke ruby with '-c' to get syntax checking
-; (defun flymake-ruby-init ()
-;   (let* ((temp-file   (flymake-init-create-temp-buffer-copy
-;                        'flymake-create-temp-inplace))
-; 	 (local-file  (file-relative-name
-;                        temp-file
-;                        (file-name-directory buffer-file-name))))
-;     (list "ruby" (list "-c" local-file))))
-;
-; (push '(".+\\.rb$" flymake-ruby-init) flymake-allowed-file-name-masks)
-; (push '("Rakefile$" flymake-ruby-init) flymake-allowed-file-name-masks)
-;
-; (push '("^\\(.*\\):\\([0-9]+\\): \\(.*\\)$" 1 2 nil 3) flymake-err-line-patterns)
-;
-; (add-hook 'ruby-mode-hook
-;           '(lambda ()
-;
-; 	     ;; Don't want flymake mode for ruby regions in rhtml files and also on read only files
-; 	     (if (and (not (null buffer-file-name)) (file-writable-p buffer-file-name))
-; 		 (flymake-mode))
-; 	     ))
+    ;; Only check on mode enable and save, not while typing.
+    (setq flycheck-check-syntax-automatically '(mode-enabled save)))
 #+end_src
 
 ** Company
@@ -151,9 +123,9 @@
 
 ** Yasnippet
 #+begin_src emacs-lisp
-  (use-package yasnippet
-    :config
-    (yas-global-mode 1))
+  ;(use-package yasnippet
+  ;  :config
+  ;  (yas-global-mode 1))
 #+end_src
 
 ** Java
@@ -237,16 +209,14 @@
 		[(:name "JavaSE-21"
 		:path "/usr/lib/jvm/java-21-openjdk"
 		:default t)])))))
-    (add-to-list 'eglot-server-programs '(java-mode . ("jdtls"))))
+    (add-to-list 'eglot-server-programs
+                 '(java-mode . ("jdtls" "-data" "~/.cache/emacs-jdtls-workspace"))))
 
   (add-hook 'java-mode-hook 'eglot-ensure)
 
-  (add-hook 'after-init-hook 'global-company-mode)
-  (setq company-idle-delay 0.1)
-  (setq company-minimum-prefix-length 1)
-
-  (setq company-backends '(company-capf))
-
+  ;; Eglot completion via company-capf.
+  (with-eval-after-load 'company
+    (setq company-backends '(company-capf)))
 #+end_src
 *** Misc. java config
 #+begin_src emacs-lisp
@@ -457,12 +427,12 @@
 
     (define-key evil-normal-state-map (kbd "<f12> v n") 'projectile-run-vterm)
     (define-key evil-normal-state-map (kbd "<f12> v r") 'rename-buffer)
-    (define-key evil-normal-state-map (kbd "<f12> p p") 'counsel-projectile-switch-project)
+    (define-key evil-normal-state-map (kbd "<f12> p p") 'projectile-switch-project)
     (define-key evil-normal-state-map (kbd "<f12> g g") 'magit-status)
     (define-key evil-normal-state-map (kbd "<f12> t w") 'toggle-word-wrap)
 
     ;; Counsel stuff
-    (define-key evil-normal-state-map (kbd "C-n") 'counsel-projectile-find-file)
+    (define-key evil-normal-state-map (kbd "C-n") 'projectile-find-file)
     (define-key evil-normal-state-map (kbd "<f12> <") 'counsel-switch-buffer)
     ;(define-key evil-normal-state-map (kbd "<f12> r") 'counsel-projectile-grep)
     (define-key evil-normal-state-map (kbd "<f12> r") 'counsel-rg)
