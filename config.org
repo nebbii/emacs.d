@@ -9,23 +9,35 @@
 #+begin_src emacs-lisp
   (defvar bootstrap-version)
   (let ((bootstrap-file
-	 (expand-file-name
-	  "straight/repos/straight.el/bootstrap.el"
-	  (or (bound-and-true-p straight-base-dir)
-	      user-emacs-directory)))
-	(bootstrap-version 7))
+   (expand-file-name
+    "straight/repos/straight.el/bootstrap.el"
+    (or (bound-and-true-p straight-base-dir)
+        user-emacs-directory)))
+  (bootstrap-version 7))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-	  (url-retrieve-synchronously
-	   "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-	   'silent 'inhibit-cookies)
-	(goto-char (point-max))
-	(eval-print-last-sexp)))
+    (url-retrieve-synchronously
+     "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+     'silent 'inhibit-cookies)
+  (goto-char (point-max))
+  (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
   (setq straight-use-package-by-default t)
   (straight-use-package 'use-package)
   (require 'use-package)
+
+  (use-package exec-path-from-shell
+    :if (memq window-system '(mac ns))
+    :init
+    (setq exec-path-from-shell-variables
+          '("PATH"
+            "MANPATH"
+            "SSH_AUTH_SOCK"
+            "SSH_AGENT_PID"
+            "GPG_TTY"))
+    :config
+    (exec-path-from-shell-initialize))
 #+end_src
 
 ** Setup Load Path
@@ -82,6 +94,18 @@
   (use-package magit
     :bind (("C-x g" . magit-status)
            ("C-x C-g" . magit-status)))
+
+  (with-eval-after-load 'magit
+    (defun my/magit-commit-create-no-hooks ()
+      "Create a commit with Git hooks disabled."
+      (interactive)
+      (let ((magit-git-global-arguments
+             (append magit-git-global-arguments
+                     '("-c" "core.hooksPath=/dev/null"))))
+        (call-interactively #'magit-commit-create)))
+
+    (transient-append-suffix 'magit-commit "c"
+      '("n" "Commit no hooks" my/magit-commit-create-no-hooks)))
 #+end_src
 
 ** Flycheck
@@ -268,10 +292,19 @@
     (setq projectile-project-search-path
           '("~/Documents/" "~/Projects/" "~/Documents/projects/" "~/.emacs.d/"))
 
-    (setq projectile-indexing-method 'hybrid)
+    (setq projectile-indexing-method 'alien)
     (setq projectile-enable-caching t)
 
     (projectile-discover-projects-in-search-path))
+#+end_src
+
+** Vterm
+#+begin_src emacs-lisp
+  (use-package vterm
+    :commands (vterm vterm-other-window)
+    :config
+    ;; Keep plenty of terminal history available inside vterm buffers.
+    (setq vterm-max-scrollback 10000))
 #+end_src
 
 ** Org mode
@@ -288,39 +321,39 @@
 
 ** Ivy & etc
 #+begin_src emacs-lisp
-  (use-package counsel)
-  (ivy-mode)
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-
-  (setq counsel-find-file-ignore-regexp
-        (concat
-         ;; File names beginning with # or .
-         "\\(?:\\`[#.]\\)"
-         ;; File names ending with # or ~
-         "\\|\\(?:\\`.+?[#~]\\'\\)"))
   (use-package ivy
-  :init
-  (ivy-mode 1)
-  (defun ivy-toggle-mark ()
-    "Toggle mark for current candidate and move forwards."
-    (interactive)
-    (if (ivy--marked-p)
-        (ivy-unmark)
-      (ivy-mark)))
-  :bind (:map ivy-minibuffer-map
-              ("C-SPC" . ivy-toggle-mark)))
+    :demand t
+    :init
+    (setq ivy-initial-inputs-alist nil)
+    (setq ivy-re-builders-alist
+          '((t . ivy--regex-ignore-order)))
+    (setq ivy-height 10)
+    (setq enable-recursive-minibuffers t)
+    :bind (:map ivy-minibuffer-map
+                ("C-SPC" . ivy-toggle-mark))
+    :config
+    (ivy-mode 1)
 
-  ;(use-package amx
-  ;  :ensure t
-  ;  :after ivy
-  ;  :custom
-  ;  (amx-backend 'auto)
-  ;  (amx-save-file "~/.config/emacs/amx-items")
-  ;  (amx-history-length 50)
-  ;  (amx-show-key-bindings nil)
-  ;  :config
-  ;  (amx-mode 1))
+    (defun ivy-toggle-mark ()
+      "Toggle mark for current candidate and move forwards."
+      (interactive)
+      (if (ivy--marked-p)
+          (ivy-unmark)
+        (ivy-mark))))
+
+  (use-package counsel
+    :after ivy
+    :config
+    (counsel-mode 1))
+
+  ;; Keep Magit using its own completion wrapper, which delegates correctly
+  ;; to Ivy when ivy-mode is enabled.
+  (use-package magit
+    :after ivy
+    :bind (("C-x g" . magit-status)
+           ("C-x C-g" . magit-status))
+    :config
+    (setq magit-completing-read-function #'magit-builtin-completing-read))
 #+end_src
 
 ** s3ed
@@ -479,6 +512,5 @@
     (lambda ()
       (unless (eq major-mode 'fundamental-mode)
         (delete-trailing-whitespace))))
-
 
 #+end_src
