@@ -262,6 +262,14 @@
     :mode ("\\.yml\\'" . yaml-mode))
 #+end_src
 
+** Lua mode
+#+begin_src emacs-lisp
+  ;;;; This snippet enables lua-mode
+  (autoload 'lua-mode "lua-mode" "Lua editing mode." t)
+  (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+  (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
+#+end_src
+
 ** Theming
 #+begin_src emacs-lisp
 (use-package timu-spacegrey-theme
