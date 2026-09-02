@@ -215,21 +215,30 @@
   ;(add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
   ;(add-hook 'java-ts-mode-hook #'lsp-java-boot-lens-mode)
 #+end_src
+*** Godot
+#+begin_src emacs-lisp
+  (use-package gdscript-mode
+      :straight (gdscript-mode
+                 :type git
+                 :host github
+                 :repo "godotengine/emacs-gdscript-mode"))
+#+end_src
 *** Eglot
 #+begin_src emacs-lisp
   ;; Use Eglot for Java
   (with-eval-after-load 'eglot
     (setq eglot-workspace-configuration
-	    '((:java
-	    (:configuration
-		(:runtimes
-		[(:name "JavaSE-21"
-		:path "/usr/lib/jvm/java-21-openjdk"
-		:default t)])))))
+      '((:java
+      (:configuration
+  	(:runtimes
+  	[(:name "JavaSE-21"
+  	:path "/usr/lib/jvm/java-21-openjdk"
+  	:default t)])))))
     (add-to-list 'eglot-server-programs
                  '(java-mode . ("jdtls" "-data" "~/.cache/emacs-jdtls-workspace"))))
 
   (add-hook 'java-mode-hook 'eglot-ensure)
+  (add-hook 'gdscript-mode-hook 'eglot-ensure)
 
   ;; Eglot completion via company-capf.
   (with-eval-after-load 'company
