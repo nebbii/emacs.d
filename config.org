@@ -96,16 +96,9 @@
            ("C-x C-g" . magit-status)))
 
   (with-eval-after-load 'magit
-    (defun my/magit-commit-create-no-hooks ()
-      "Create a commit with Git hooks disabled."
-      (interactive)
-      (let ((magit-git-global-arguments
-             (append magit-git-global-arguments
-                     '("-c" "core.hooksPath=/dev/null"))))
-        (call-interactively #'magit-commit-create)))
-
-    (transient-append-suffix 'magit-commit "c"
-      '("n" "Commit no hooks" my/magit-commit-create-no-hooks)))
+    (setq magit-git-global-arguments
+          (append magit-git-global-arguments
+                  '("-c" "core.hooksPath=/dev/null"))))
 #+end_src
 
 ** Flycheck
@@ -327,7 +320,7 @@
     (setq ivy-initial-inputs-alist nil)
     (setq ivy-re-builders-alist
           '((t . ivy--regex-ignore-order)))
-    (setq ivy-height 10)
+    (setq ivy-height 15)
     (setq enable-recursive-minibuffers t)
     :bind (:map ivy-minibuffer-map
                 ("C-SPC" . ivy-toggle-mark))
